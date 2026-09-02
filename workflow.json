@@ -1,0 +1,738 @@
+{
+  "name": "Trabalho UNIFECAF",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "d27d2ab2-6a17-4f3c-9c2e-e3319c64a54c",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1040,
+        -64
+      ],
+      "id": "09006656-1c65-4976-b88d-892b2f8f243b",
+      "name": "Webhook",
+      "webhookId": "d27d2ab2-6a17-4f3c-9c2e-e3319c64a54c"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "72d48f42-f4b5-4d1b-8de8-2b88bf3ee6a8",
+              "leftValue": "={{ $json.body.message_type }}",
+              "rightValue": "incoming",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -912,
+        -64
+      ],
+      "id": "ca294a9b-3782-4e3f-a1b0-42fd4e72ef9c",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "content": "## Entrada",
+        "height": 240,
+        "width": 352
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1040,
+        -112
+      ],
+      "typeVersion": 1,
+      "id": "54af866f-69f9-4e94-bb0d-f3584f63b985",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.content }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    },
+                    "id": "c08854a3-05d8-4e69-ac27-a1ae5f431d48"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "texto"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "1b7f417e-ec13-48df-b4c0-e5d8f90865f8",
+                    "leftValue": "={{ $json.body.conversation.last_non_activity_message.attachments[0].meta.is_recorded_audio }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "b99abb05-0ff7-462f-bede-008a2eea7c8b",
+                    "leftValue": "={{ $json.body.attachments[0].file_type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "imagem"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -784,
+        -64
+      ],
+      "id": "b40ceaa6-f397-47fe-9b7e-a3abc73e2e5c",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "content": "## Tratamento de Áudio",
+        "height": 208,
+        "width": 480,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1040,
+        128
+      ],
+      "typeVersion": 1,
+      "id": "90205726-6827-44cc-bfa9-5ac33c13d209",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.content }} {{ $json.content.parts[0].text }} ",
+        "options": {
+          "systemMessage": "Você é o \"DOMAIN Copilot\", um assistente executivo e copiloto de Inteligência Artificial para a equipe de Recursos Humanos e Comunicação Interna da DOMAIN Tech & People Solutions.\n\nCONTEXTO INSTITUCIONAL:\nA DOMAIN é uma consultoria de soluções corporativas e tecnologia em RH. O tom de voz da empresa é executivo, dinâmico, acolhedor, moderno e inclusivo. Sua missão é transformar entradas brutas (textos, áudios transcritos, notas de reunião e imagens/relatórios) em comunicações corporativas prontas, claras e alinhadas à cultura da marca.\n\n---\n\nDIRETRIZES DE PROCESSAMENTO E ESTILO:\n\n1. AVISOS E COMUNICADOS INSTITUCIONAIS:\n   - Estrutura clara e objetiva para leitura rápida.\n   - Use negritos em prazos, datas e contatos importantes.\n   - Inclua uma chamada para ação (CTA) direta.\n\n2. ATAS E RESUMOS DE REUNIÃO:\n   - Extraia e organize as informações obrigatoriamente nos seguintes tópicos:\n     • Principais Pontos Discutidos\n     • Decisões Tomadas\n     • Próximos Passos (com responsáveis e prazos)\n\n3. MÓDULO DE E-MAILS CORPORATIVOS:\n   - Assunto: Curto e iniciado por uma tag entre colchetes. Ex: [COMUNICADO], [CONVOCAÇÃO], [LEMBRETE], [BOAS-VINDAS].\n   - Saudação: Adequada ao público (ex: \"Prezados colaboradores,\", \"Olá, gestores,\", \"Prezado(a) [Nome],\").\n   - Corpo do Texto: Direto ao ponto, com tópicos (bullet points) para legibilidade.\n   - Assinatura Padrão:\n     Atenciosamente,\n     [Nome do Departamento / Equipe responsável]\n     DOMAIN Tech & People Solutions\n\n---\n\nINSTRUÇÕES DE USO DE FERRAMENTAS (TOOLS):\n\n1. FERRAMENTA DE E-MAIL (`enviar_email`):\n   - Chame a ferramenta `enviar_email` APENAS quando o usuário solicitar explicitamente o disparo do e-mail (Ex: \"envie este e-mail\", \"dispare para os gestores\").\n   - Se o usuário pedir apenas uma criação, rascunho ou revisão (Ex: \"crie um e-mail\", \"escreva um texto\"), NÃO chame a ferramenta; apenas exiba o texto formatado na conversa.\n\n---\n\nGUARDRAILS, SEGURANÇA E REGRAS DE PARADA (OBRIGATÓRIO):\n\n1. CONTROLE DE FLUXO E REPETIÇÃO (EVITAR LOOPS):\n   - Gere a resposta para o usuário APENAS UMA VEZ por mensagem recebida.\n   - Após executar com sucesso uma ferramenta (como `enviar_email`), responda APENAS com uma mensagem curta de confirmação (Ex: \"E-mail enviado com sucesso para a equipe!\"). NÃO reenvie o corpo do e-mail nem chame a ferramenta novamente.\n   - Responda estritamente à ÚLTIMA mensagem recebida, utilizando o histórico de memória apenas para consultar o contexto.\n\n2. PRIVACIDADE E LGPD:\n   - Nunca exponha dados sensíveis (CPF, salários, diagnósticos de saúde). Substitua qualquer dado sensível detectado por [DADO PROTEGIDO].\n\n3. FIDELIDADE AOS DADOS:\n   - Não invente datas, horários ou nomes que não constem na instrução original. Se uma informação essencial estiver faltando, insira a tag [INSERIR DATA/INFORMAÇÃO].\n\n---\n\nFORMATO PADRÃO DE SAÍDA(Somente se for o conteúdo final formatado, se for saudações ou contato inicial com o usuário, desconsidere o formato padrão, porém se for o conteúdo final gerado após o recebimento do texto bruto utilize-o:\n\n[TIPO DE TEXTO GERADO: Ex: Comunicado Oficial / Resumo de Reunião / E-mail Corporativo]\n\n(Conteúdo final formatado e pronto)\n\n---\n💡 Dica do Copilot: (Sua orientação ou recomendação prática para o usuário do RH)\n\n\n\nOBS - email corporativo da empresa:\ncontadoslah@gmail.com"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -336,
+        -16
+      ],
+      "id": "bc01e14e-cabf-4997-8e28-71db8adabe83",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "content": "## Tratamento de Imagem",
+        "height": 192,
+        "width": 480,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1040,
+        336
+      ],
+      "typeVersion": 1,
+      "id": "4ef16cff-d548-4ade-819d-c79d75901551",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -336,
+        160
+      ],
+      "id": "855a1812-9f72-49af-9477-61cf279c8993",
+      "name": "LLM"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": []
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        -336,
+        272
+      ],
+      "id": "4b6dff43-478e-4e75-aa9f-94da54daa492",
+      "name": "enviar_email",
+      "webhookId": "fbb2c1d7-40dd-4dd9-9001-58be1674e1b1"
+    },
+    {
+      "parameters": {
+        "resource": "Messages",
+        "operation": "Create A New Message In A Conversation",
+        "account_id": "={{ $('Filter').item.json.body.conversation.messages[0].account_id }}",
+        "conversation_id": "={{ $('Filter').item.json.body.conversation.id }}",
+        "content": "={{ $json.output }}",
+        "private": false,
+        "content_type": "=text",
+        "template_params": "{}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-chatwoot.chatWoot",
+      "typeVersion": 1,
+      "position": [
+        32,
+        -16
+      ],
+      "id": "f7509c86-8bc1-4519-a89a-4ae3f883b42f",
+      "name": "Criar Mensagem"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3.5-flash-lite",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3.5-flash-lite"
+        },
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -656,
+        192
+      ],
+      "id": "2f336c78-850d-48c0-8681-1ab7f7ba10cd",
+      "name": "Audio",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3.5-flash-lite",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3.5-flash-lite"
+        },
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -656,
+        384
+      ],
+      "id": "b8c637c1-8001-4c88-9bc7-aa44d3f399b6",
+      "name": "imagem",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.body.conversation.messages[0].attachments[0].data_url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -1040,
+        192
+      ],
+      "id": "8d77a02a-a7d5-4ba1-b3da-9603c1cda222",
+      "name": "Busca_audio",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.body.conversation.messages[0].attachments[0].data_url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -1040,
+        384
+      ],
+      "id": "15fbc423-9f58-4cbf-85a1-a69a9f4ae5c8",
+      "name": "Busca_imagem",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -912,
+        192
+      ],
+      "id": "fcd95fb6-561a-4d46-868d-0492585f557f",
+      "name": "Extrai Audio",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -912,
+        384
+      ],
+      "id": "270af235-c509-4432-b60b-aca23c10b3fe",
+      "name": "Extrai Imagem",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -784,
+        192
+      ],
+      "id": "db2859e0-08f3-401a-ad82-0d073ff27507",
+      "name": "Converte Audio",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -784,
+        384
+      ],
+      "id": "9c8413f5-3e67-47b6-a508-5c0606d94134",
+      "name": "Converte Imagem",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "## Cérebro",
+        "height": 464,
+        "width": 256,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -352,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "7458aeb0-e5a9-439b-b703-b419cc663052",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Saída",
+        "height": 176,
+        "width": 256,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -48,
+        -48
+      ],
+      "typeVersion": 1,
+      "id": "b643a940-39dd-412b-a589-423c20130a46",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Switch').item.json.body.conversation.messages[0].sender.phone_number }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -240,
+        160
+      ],
+      "id": "5b2df7bd-83e4-4840-9e1f-fea03cd89ead",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "76553d4c-d915-48de-ac0d-f172c7f8d046",
+              "name": "body.content",
+              "value": "={{ $json.body.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -496,
+        16
+      ],
+      "id": "bbed881e-aa46-41a3-bc67-a48a852c6c2d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "92b7d43b-d69f-4788-8904-6089f6a4ccad",
+              "name": "content.parts[0].text",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -496,
+        256
+      ],
+      "id": "b6d2db1f-3983-4ffa-8ff0-1f13c44d75e1",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "583bf4fc-c976-49f6-b164-edc2a194cd6b",
+              "name": "content.parts[0].text",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -496,
+        144
+      ],
+      "id": "460cd0a4-2033-4716-8f1a-3812ef6b04fd",
+      "name": "Edit Fields2"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Busca_audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Busca_imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Criar Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enviar_email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "imagem": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca_audio": {
+      "main": [
+        [
+          {
+            "node": "Extrai Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca_imagem": {
+      "main": [
+        [
+          {
+            "node": "Extrai Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai Audio": {
+      "main": [
+        [
+          {
+            "node": "Converte Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai Imagem": {
+      "main": [
+        [
+          {
+            "node": "Converte Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Converte Audio": {
+      "main": [
+        [
+          {
+            "node": "Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Converte Imagem": {
+      "main": [
+        [
+          {
+            "node": "imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  }
+}
